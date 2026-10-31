@@ -1,0 +1,14 @@
+cod_instrucao,descricao
+1,Analfabeto
+2,Até 5ª Incompleto
+3,5ª Completo Fundamental
+4,6ª a 9ª Fundamental
+5,Fundamental Completo
+6,Médio Incompleto
+7,Médio Completo
+8,Superior Incompleto
+9,Superior Completo
+10,Mestrado
+11,Doutorado
+80,Pós-Graduação completa
+99,Não Identificado

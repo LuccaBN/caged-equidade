@@ -1,0 +1,115 @@
+{
+  "competencias": [
+    202608
+  ],
+  "arquivos": [
+    "CAGEDFOR202608.txt",
+    "CAGEDEXC202608.txt",
+    "CAGEDMOV202608.txt"
+  ],
+  "original": {
+    "linhas_lidas": 4494379,
+    "colunas_originais": 28,
+    "colunas_usadas": 18,
+    "linhas_fora_da_janela_descartadas": 71080,
+    "linhas_por_arquivo": {
+      "MOV": 4423299,
+      "FOR": 0,
+      "EXC": 0
+    }
+  },
+  "qualidade": {
+    "idade_nula": 2888,
+    "salario_zerado": 55913,
+    "salario_nao_mensal": 335973,
+    "salario_fora_da_faixa": 8661,
+    "salario_valido": 4093832,
+    "pct_salario_valido": 91.09,
+    "codigos_ausentes_no_layout": {
+      "dim_cbo": 12
+    }
+  },
+  "resultado": {
+    "fato_agregada_linhas": 85641,
+    "fato_ba_linhas": 176743,
+    "admissoes": 2294563,
+    "desligamentos": 2128736,
+    "saldo": 165827,
+    "saldo_apenas_mov": 165827
+  },
+  "banco": {
+    "tamanho_total_mb": 44.88,
+    "tabelas": [
+      {
+        "tabela": "fato_movimentacao_ba",
+        "linhas": 176743,
+        "tamanho_mb": 25.55
+      },
+      {
+        "tabela": "fato_movimentacao_agregada",
+        "linhas": 85641,
+        "tamanho_mb": 10.39
+      },
+      {
+        "tabela": "dim_municipio",
+        "linhas": 5659,
+        "tamanho_mb": 0.46
+      },
+      {
+        "tabela": "dim_cbo",
+        "linhas": 2790,
+        "tamanho_mb": 0.3
+      },
+      {
+        "tabela": "controle_carga",
+        "linhas": 1,
+        "tamanho_mb": 0.03
+      },
+      {
+        "tabela": "dim_regiao",
+        "linhas": 6,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_faixa_etaria",
+        "linhas": 8,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_tipo_movimentacao",
+        "linhas": 18,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_instrucao",
+        "linhas": 13,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_raca_cor",
+        "linhas": 7,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_uf",
+        "linhas": 28,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_tempo",
+        "linhas": 1,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_secao",
+        "linhas": 22,
+        "tamanho_mb": 0.02
+      },
+      {
+        "tabela": "dim_sexo",
+        "linhas": 3,
+        "tamanho_mb": 0.02
+      }
+    ]
+  }
+}

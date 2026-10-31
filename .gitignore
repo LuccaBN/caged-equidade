@@ -1,0 +1,16 @@
+# Credenciais (NUNCA versionar)
+.env
+*.tfvars
+!*.tfvars.example
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform.lock.hcl
+
+# Dados brutos (grandes; baixados pelo ETL)
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

@@ -1,0 +1,19 @@
+cod_tipo_mov,descricao,classe
+10,Admissão por primeiro emprego,Admissão
+20,Admissão por reemprego,Admissão
+25,Admissão por contrato trabalho prazo determinado,Admissão
+31,Desligamento por demissão sem justa causa,Desligamento
+32,Desligamento por demissão com justa causa,Desligamento
+33,Culpa Recíproca,Desligamento
+35,Admissão por reintegração,Admissão
+40,Desligamento a pedido,Desligamento
+43,Término contrato trabalho prazo determinado,Desligamento
+45,Desligamento por Término de contrato,Desligamento
+50,Desligamento por aposentadoria,Desligamento
+60,Desligamento por morte,Desligamento
+70,Admissão por transferência,Admissão
+80,Desligamento por transferência,Desligamento
+90,Desligamento por Acordo entre empregado e empregador,Desligamento
+97,Admissão de Tipo Ignorado,Admissão
+98,Desligamento de Tipo Ignorado,Desligamento
+99,Não Identificado,Não identificado
