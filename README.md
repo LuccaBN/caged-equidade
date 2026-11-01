@@ -59,6 +59,8 @@ caged-equidade/
 | Arquivos | `CAGEDMOV` (movimentações), `CAGEDFOR` (fora do prazo), `CAGEDEXC` (exclusões) |
 | Dicionário | `Layout Não-identificado Novo Caged Movimentação.xlsx` (22 abas de códigos) |
 | Versão utilizada | Competência **agosto/2026** (publicada em setembro/2026) |
+| Recorte | Brasil inteiro agregado; **Bahia** linha a linha; janela de até 12 meses |
+| Características | Base não identificada (sem CPF/nome); 4,4 milhões de linhas/mês; códigos numéricos explicados pelo layout; sexo e raça/cor em todas as linhas |
 
 **Arquivos originais processados nesta versão:**
 
@@ -238,38 +240,92 @@ aproximadamente **435 MB**, dentro do limite de 1 GB do plano gratuito.
 
 ---
 
-## 5. Como reproduzir
+## 5. Infraestrutura
+
+| Item | Detalhe |
+|---|---|
+| Nuvem | Aiven (plano gratuito) |
+| Serviço | PostgreSQL 16 gerenciado, 1 nó, 1 GB de disco |
+| Ferramenta de provisionamento | Terraform 1.5+ com o provider oficial `aiven/aiven` (v4) |
+| Processamento | Python 3.11+ (Pandas, NumPy, psycopg2, py7zr), executado localmente |
+| Versionamento | Git / GitHub |
+
+**Recursos provisionados pelo Terraform** (pasta `terraform/`):
+
+| Recurso | O que cria |
+|---|---|
+| `aiven_pg.caged` | O serviço PostgreSQL na Aiven (plano, região e versão definidos em variáveis) |
+| `aiven_pg_database.caged` | O banco `caged` dentro do serviço, usado pelo ETL |
+
+**Arquivos:**
+- `main.tf` → provider e recursos
+- `variables.tf` → parâmetros (token, projeto, plano, região, versão); o token é marcado como `sensitive`
+- `outputs.tf` → endereço, porta, usuário e a `database_url` (senha marcada como `sensitive`)
+- `terraform.tfvars.example` → modelo para preencher as credenciais
+
+As tabelas não são criadas pelo Terraform: o ETL executa `sql/schema.sql` (idempotente) a cada carga. Assim, o Terraform cuida só da infraestrutura e o código cuida da estrutura dos dados.
+
+## 6. Segurança das informações
+
+**Estratégia:** nenhuma credencial é escrita no código. Todas ficam em arquivos locais que o Git ignora, e o repositório só traz **modelos** desses arquivos, sem valores reais.
+
+| Credencial | Onde fica | Protegida por |
+|---|---|---|
+| Token de API da Aiven | `terraform/terraform.tfvars` | `.gitignore` (`*.tfvars`) |
+| Senha e endereço do banco | `.env` (`DATABASE_URL`) | `.gitignore` (`.env`) |
+| Estado do Terraform (contém a senha do banco) | `terraform/terraform.tfstate` | `.gitignore` (`*.tfstate`) |
+
+Outras medidas:
+- **Modelos sem segredo:** `terraform.tfvars.example` e `.env.example` mostram o formato esperado, com valores fictícios.
+- **Variáveis sensíveis:** o token e a senha são marcados como `sensitive` no Terraform e não aparecem na tela no `plan` nem no `apply`. A senha só é exibida com `terraform output -raw`.
+- **Código lê do ambiente:** `etl/config.py` monta a conexão a partir de `DATABASE_URL` (ou `PGHOST`, `PGPASSWORD` etc.). Trocar a senha não exige mudar código.
+- **Conexão criptografada:** `sslmode=require` em toda conexão com o banco.
+- **Se uma credencial vazar:** gerar um novo token na Aiven e redefinir a senha do serviço. Apagar o arquivo não basta, porque ele fica no histórico do Git.
+
+## 7. Como reproduzir
 
 ### Pré-requisitos
 - Python 3.11+
 - Terraform 1.5+
+- Git
 - Conta gratuita na Aiven e um token de API (*User profile → Tokens*)
+- Os arquivos do CAGED (baixados automaticamente do FTP, ou colocados à mão em `data/raw/`)
+
+### Sequência geral
+1. Provisionar o banco com Terraform
+2. Configurar as credenciais no `.env`
+3. Rodar o ETL (extração → tratamento → carga)
+4. Conferir a carga no banco
+
+Os comandos abaixo são para o PowerShell (Windows). No Linux/Mac, troque `copy` por `cp` e `.venv\Scripts\activate` por `source .venv/bin/activate`.
 
 ### Passo 1: provisionar o banco (Terraform)
-```bash
+```powershell
 cd terraform
-cp terraform.tfvars.example terraform.tfvars   # preencher token e projeto
+copy terraform.tfvars.example terraform.tfvars   # preencher token e projeto
 terraform init
 terraform plan
 terraform apply
-terraform output -raw database_url              # copiar para o .env
+terraform output -raw database_url               # copiar para o .env
 cd ..
 ```
 
 ### Passo 2: configurar as credenciais
-```bash
-cp .env.example .env    # colar a DATABASE_URL obtida no passo anterior
+```powershell
+copy .env.example .env    # colar a DATABASE_URL obtida no passo anterior
 ```
 
 ### Passo 3: rodar o ETL
-```bash
+```powershell
 python -m venv .venv
 .venv\Scripts\activate          # Windows  (Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
 
-python etl/pipeline.py --competencias 202608     # um mês
-python etl/pipeline.py --ultimos 12              # janela de 12 meses
+python etl\pipeline.py --competencias 202608     # um mês
+python etl\pipeline.py --ultimos 12              # janela de 12 meses
 ```
+
+Resultado esperado para agosto/2026: `saldo: 165827` (igual ao número oficial do MTE).
 
 Se o FTP estiver fora do ar, coloque os arquivos `.7z` (ou as pastas já
 descompactadas) e o layout em `data/raw/` e rode com `--sem-download`.
@@ -283,10 +339,8 @@ SELECT * FROM vw_gap_salarial_admissao;
 
 ---
 
-## Segurança e LGPD
+## LGPD
 
-- Nenhuma credencial no código. Token da Aiven em `terraform.tfvars` e conexão do banco em `.env`, ambos no `.gitignore`.
-- Conexão com o banco usa SSL (`sslmode=require`).
 - Os microdados já são publicados sem identificação (sem nome, CPF, PIS ou CNPJ).
 - A idade exata não é gravada, só a faixa etária.
 - As views de consumo ocultam as medianas de salário de grupos com menos de 5 registros, e o painel aplica a mesma regra depois de agrupar.

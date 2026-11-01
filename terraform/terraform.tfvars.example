@@ -1,0 +1,6 @@
+# Copie este arquivo para terraform.tfvars e preencha.
+# O terraform.tfvars está no .gitignore e NUNCA deve ir para o GitHub.
+aiven_api_token = "cole-aqui-o-token-da-aiven"
+aiven_project   = "nome-do-seu-projeto-na-aiven"
+# cloud_name    = "do-nyc"
+# pg_plan       = "free-1-1gb"
